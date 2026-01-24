@@ -1,4 +1,4 @@
-class_name Runtime
+class_name OldRuntime
 extends RefCounted
 
 var tokens: Array[Token] = []

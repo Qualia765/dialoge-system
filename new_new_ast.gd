@@ -1,4 +1,4 @@
-class_name NewNewAST
+class_name AST
 extends RefCounted
 
 
@@ -63,16 +63,16 @@ class ParseState:
 		error_msg += str("Line ", line_num, ": ", msg, "\n")
 	
 	func parse_name() -> String:
-		var cut_point := NewNewAST.find_chars(text, " \n\t$")
+		var cut_point := AST.find_chars(text, " \n\t$")
 		if cut_point != len(text) && text[cut_point] == "$":
 			add_error("Unexpected '$' in name")
-			cut_point = NewNewAST.find_chars(text, " \n\t")
+			cut_point = AST.find_chars(text, " \n\t")
 		var yoinked := text.substr(0, cut_point)
 		text = text.substr(cut_point)
 		return yoinked
 	
 	func parse_instruct_name() -> String:
-		var cut_point := NewNewAST.find_chars(text, " \n\t")
+		var cut_point := AST.find_chars(text, " \n\t")
 		var yoinked := text.substr(0, cut_point)
 		text = text.substr(cut_point)
 		return yoinked
@@ -123,7 +123,7 @@ class ParseState:
 		return node
 	
 	func parse_gdscript() -> String:
-		var cut_point := NewNewAST.find_chars(text, "$\n")
+		var cut_point := AST.find_chars(text, "$\n")
 		var result = text.substr(0, cut_point).replace("\\n", "\n").replace("\\d", "$").replace("\\x", "!")
 		text = text.substr(cut_point)
 		if text.is_empty(): return result
@@ -194,7 +194,7 @@ class BlockNode extends AstNode:
 		var result = ""
 		for node in nodes:
 			result += str(node)
-		return  "{\n" + NewNewAST.indent_string(result.rstrip(" \t\n")) + "\n} "
+		return  "{\n" + AST.indent_string(result.rstrip(" \t\n")) + "\n} "
 
 
 
@@ -205,7 +205,7 @@ class TextNode extends AstNode:
 	func parse(state: ParseState) -> void:
 		var msg_mode: bool = true
 		while true:
-			var cut_point := NewNewAST.find_chars(state.text, "$!\n")
+			var cut_point := AST.find_chars(state.text, "$!\n")
 			var section = state.text.substr(0, cut_point).replace("\\n", "\n").replace("\\d", "$").replace("\\x", "!")
 			if msg_mode:
 				msg_parts.push_back(section)
@@ -245,7 +245,7 @@ class SayNode extends AstNode:
 class CommentNode extends AstNode:
 	var msg: String = ""
 	func parse(state: ParseState) -> void:
-		var cut_point := NewNewAST.find_chars(state.text, "\n")
+		var cut_point := AST.find_chars(state.text, "\n")
 		msg = state.text.substr(0, cut_point)
 		state.text = state.text.substr(cut_point)
 		if state.text.is_empty(): return
@@ -286,7 +286,7 @@ class TaskCheckpointNode extends AstNode:
 	func parse(state: ParseState) -> void:
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return "TaskCheckpoint " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
+		return "TaskCheckpoint " + AST.add_new_line_if_not_at_end_already(str(node))
 
 class IfNode extends AstNode:
 	var node: AstNode
@@ -297,7 +297,7 @@ class IfNode extends AstNode:
 		state.lstrip()
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return NewNewAST.add_new_line_if_not_at_end_already(str("If ", condition, node))
+		return AST.add_new_line_if_not_at_end_already(str("If ", condition, node))
 
 class AwaitNode extends AstNode:
 	var code: String
@@ -341,7 +341,7 @@ class ElseNode extends AstNode:
 		state.lstrip()
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return "Else " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
+		return "Else " + AST.add_new_line_if_not_at_end_already(str(node))
 
 class LoopNode extends AstNode:
 	var node: AstNode
@@ -349,7 +349,7 @@ class LoopNode extends AstNode:
 		state.lstrip()
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return "Loop " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
+		return "Loop " + AST.add_new_line_if_not_at_end_already(str(node))
 
 class OnceNode extends AstNode:
 	var node: AstNode
@@ -357,7 +357,7 @@ class OnceNode extends AstNode:
 		state.lstrip()
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return "Once " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
+		return "Once " + AST.add_new_line_if_not_at_end_already(str(node))
 
 class WhileNode extends AstNode:
 	var node: AstNode
@@ -368,7 +368,7 @@ class WhileNode extends AstNode:
 		state.lstrip()
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return NewNewAST.add_new_line_if_not_at_end_already(str("While ", condition, node))
+		return AST.add_new_line_if_not_at_end_already(str("While ", condition, node))
 
 class UntilNode extends AstNode:
 	var node: AstNode
@@ -379,7 +379,7 @@ class UntilNode extends AstNode:
 		state.lstrip()
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return NewNewAST.add_new_line_if_not_at_end_already(str("Until ", condition, node))
+		return AST.add_new_line_if_not_at_end_already(str("Until ", condition, node))
 
 class TaskAddNode extends AstNode:
 	var task_name: String = ""
@@ -402,20 +402,20 @@ class TaskAddNode extends AstNode:
 
 class TaskNode extends AstNode:
 	var task_name: String = ""
-	var importance: ValueOrGDScriptNode = ValueOrGDScriptNode.new()
+	var utility: ValueOrGDScriptNode = ValueOrGDScriptNode.new()
 	var node: AstNode
 	func parse(state: ParseState) -> void:
 		state.lstrip()
 		if state.text.is_empty():
-			state.add_error("Expected task name, importance, and node but found end of file")
+			state.add_error("Expected task name, utility, and node, but found end of file")
 			return
 		task_name = state.parse_name()
-		importance = ValueOrGDScriptNode.new()
-		importance.parse(state)
+		utility = ValueOrGDScriptNode.new()
+		utility.parse(state)
 		state.lstrip()
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		return NewNewAST.add_new_line_if_not_at_end_already(str("Task ", task_name, " ", importance, " ", node))
+		return AST.add_new_line_if_not_at_end_already(str("Task ", task_name, " ", utility, " ", node))
 
 class TagNode extends AstNode:
 	var tag_name: String = ""
@@ -423,7 +423,7 @@ class TagNode extends AstNode:
 	func parse(state: ParseState) -> void:
 		state.lstrip()
 		if state.text.is_empty():
-			state.add_error("Expected tag name, importance, and node but found end of file")
+			state.add_error("Expected tag name and value but found end of file")
 			return
 		tag_name = state.parse_name()
 		value = ValueOrGDScriptNode.new()
@@ -483,4 +483,4 @@ class OptionNode extends AstNode:
 		var result: String = ""
 		for index in range(len(blocks)):
 			result += str("!", option_names[index], "! ", blocks[index], "\n")
-		return str("Option {\n", NewNewAST.indent_string(result.rstrip(" \t\n")), "\n} ")
+		return str("Option {\n", AST.indent_string(result.rstrip(" \t\n")), "\n} ")

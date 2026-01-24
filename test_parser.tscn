@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://qpah81fwwhyf"]
 
-[ext_resource type="Script" uid="uid://buyon2wbhx5ac" path="res://main.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://buyon2wbhx5ac" path="res://test_parser.gd" id="1_ig7tw"]
 
 [sub_resource type="SystemFont" id="SystemFont_ig7tw"]
 font_names = PackedStringArray("Monospace")
@@ -86,16 +86,43 @@ horizontal_scroll_mode = 0
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "- Design and Implement Task Modifiers & tags
-      - More ergonomic/preformant ways of modifying the importance value than a signle funciton
+text = "========Architecture==========
+PARSER: takes code and makes AST
+ASSEMBALLER: takes AST and programs and metadata
+GLOBAL: takes programs and metadata and makes AGENTs
+AGENT: selects between tasks and starts and stops RUNTIMEs
+RUNTIME: runs programs
+
+CODE: a string
+PROGRAM: an array of INSTRUCTIONs
+INSTRUCTION: a bunch of different classes to do something (such as run say something and wait, run gdscript, jump to a line if an condition is met)
+AST: a bunch of different classes that hold the informaiton in the CODE in an easily accessable manner
+
+ s
+Runtime:
+- program: Array[Instructinos]
+- current_instruction: int
+- async_signal: Signal
+- execute(): program[current_instruction].execute(self)
+- async_recieve(): execute()
+- quit(): async_signal.disconnect(async_recieve)
+
+
+
+==========TODO==========
+- Design and Implement Task Modifiers & tags
+	- More ergonomic/preformant ways of modifying the utiltiy value than a signle funciton
+- Multi-tasking
+	- A single Agent doing mutliple tasks at a given moment
+- Translations/Audio
+- Macros
+- Cached GDscript Results
 - Implement Runtime
-      - first convert from AST's nodes to runtime instructions
-      - do more error  checking in that process
+	- first convert from AST's nodes to runtime instructions
+	- do more error  checking in that process
 - Syntax Highlighter??????
 - Automated Tests?
 - DO NOT REDESIGN THE ENTIRE LANGUAGE AGAIN!!!!!!
-
-
 
 
 
@@ -188,8 +215,8 @@ Once {
 // Tasks are like functions, but the happen and interupt each other as the utility AI does its magics
 
 Task generic_task_name 15 {
-	!15 is the \"importance\" of the task?
-	!Higher importance means it will go before a task of a lower importance
+	!15 is the \"utility\" of the task
+	!Higher utility means it will go before a task of a lower utility
 	// GDscript can be used instead of fixed number
 	//Task generic_task_name $15 + sin(time * 6.283) * 2$ {
 	
@@ -260,17 +287,17 @@ How tags are applied is evaluated before runtime - you cant do any fancy, apply 
 
 
 
-====Importance Tag====
+====Utility Tag====
 // it takes no other task with importance >500 to switch to this task
 Task task_name 500 {
-	Tag importance 509
+	Tag utility 509
 	!Stay in this task unless a task of over 509 comes up
 	{
-		Tag importance 704
-		!This is of greater importance to say in one go
+		Tag utility 704
+		!This is of greater utility to say in one go
 		TaskCheckpoint {} // Put the checkpoint instead of of the thing
 	}
-	!The importance is now 509 again, if there was a task of 601 or whatever, it would eject after this message
+	!The utility is now 509 again, if there was a task of 601 or whatever, it would eject after this message
 	TaskEnd
 }"
 autowrap_mode = 3

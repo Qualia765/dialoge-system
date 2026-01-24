@@ -1,4 +1,4 @@
-class_name AST
+class_name OldAST
 extends RefCounted
 
 # this only tokenizes

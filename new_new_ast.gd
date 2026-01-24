@@ -103,8 +103,7 @@ class ParseState:
 		else:
 			var instruct = parse_instruct_name()
 			match instruct:
-				"Option":
-					assert(false, "todo")
+				"Option": node = OptionNode.new()
 				"Task": node = TaskNode.new()
 				"TaskAdd": node = TaskAddNode.new()
 				"TaskEnd": node = TaskEndNode.new()
@@ -115,6 +114,8 @@ class ParseState:
 				"Loop": node = LoopNode.new()
 				"While": node = WhileNode.new()
 				"Until": node = UntilNode.new()
+				"Once": node = OnceNode.new()
+				"Await": node = AwaitNode.new()
 				_:
 					add_error(str("Unknown Instruction '", instruct, "'"))
 					return
@@ -132,11 +133,11 @@ class ParseState:
 
 
 
-
 @abstract class AstNode:
 	var depth: int = 0
 	@abstract func parse(state: ParseState) -> void
 	@abstract func _to_string() -> String
+
 
 
 static func indent_string(input: String) -> String:
@@ -149,6 +150,7 @@ static func indent_string(input: String) -> String:
 			result += "\n"
 		i += 1
 	return result
+
 
 
 class RootNode extends AstNode:
@@ -170,6 +172,7 @@ class RootNode extends AstNode:
 		for node in nodes:
 			result += str(node)
 		return result.rstrip(" \t\n")
+
 
 
 class BlockNode extends AstNode:
@@ -195,7 +198,7 @@ class BlockNode extends AstNode:
 
 
 
-class SayNode extends AstNode:
+class TextNode extends AstNode:
 	var msg_parts: Array[String] = []
 	var code_parts: Array[String] = []
 	
@@ -219,7 +222,7 @@ class SayNode extends AstNode:
 		state.text = state.text.substr(1) # to deal with ! or \n
 	
 	func _to_string() -> String:
-		var result: String = "!"
+		var result: String = ""
 		var index: int = 0
 		while true:
 			if index >= len(msg_parts): break
@@ -227,9 +230,17 @@ class SayNode extends AstNode:
 			if index >= len(code_parts): break
 			result += code_parts[index].replace("\n", "\\n").replace("$", "\\d").replace("!", "\\x") + "$"
 			index += 1
-		result[len(result)-1] = "\n"
-		return result
+		return result.substr(0, len(result) - 1)
 
+
+
+class SayNode extends AstNode:
+	var text_node: TextNode
+	func parse(state: ParseState) -> void:
+		text_node = TextNode.new()
+		text_node.parse(state)
+	func _to_string() -> String:
+		return str("!", text_node, "\n")
 
 class CommentNode extends AstNode:
 	var msg: String = ""
@@ -273,17 +284,9 @@ class TaskEndNode extends AstNode:
 class TaskCheckpointNode extends AstNode:
 	var node: AstNode
 	func parse(state: ParseState) -> void:
-		state.lstrip_half()
-		if state.text.is_empty(): return
-		if state.text[0] == "\n":
-			node = null
-		else:
-			node = state.parse_instruct_node()
+		node = state.parse_instruct_node()
 	func _to_string() -> String:
-		if node == null:
-			return "TaskCheckpoint\n"
-		else:
-			return "TaskCheckpoint " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
+		return "TaskCheckpoint " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
 
 class IfNode extends AstNode:
 	var node: AstNode
@@ -295,6 +298,21 @@ class IfNode extends AstNode:
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
 		return NewNewAST.add_new_line_if_not_at_end_already(str("If ", condition, node))
+
+class AwaitNode extends AstNode:
+	var code: String
+	func parse(state: ParseState) -> void:
+		state.lstrip()
+		if state.text.is_empty():
+			state.add_error("Expected $, but found end of file")
+			return
+		if state.text[0] != "$":
+			state.add_error(str("Expected $, but found ", state.text[0]))
+			return
+		state.text = state.text.substr(1)
+		code = state.parse_gdscript()
+	func _to_string() -> String:
+		return str("Await $", code, "$\n")
 
 class ValueOrGDScriptNode extends AstNode:
 	var isCode: bool = false
@@ -332,6 +350,14 @@ class LoopNode extends AstNode:
 		node = state.parse_instruct_node()
 	func _to_string() -> String:
 		return "Loop " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
+
+class OnceNode extends AstNode:
+	var node: AstNode
+	func parse(state: ParseState) -> void:
+		state.lstrip()
+		node = state.parse_instruct_node()
+	func _to_string() -> String:
+		return "Once " + NewNewAST.add_new_line_if_not_at_end_already(str(node))
 
 class WhileNode extends AstNode:
 	var node: AstNode
@@ -397,7 +423,7 @@ class TagNode extends AstNode:
 	func parse(state: ParseState) -> void:
 		state.lstrip()
 		if state.text.is_empty():
-			state.add_error("Expected task name, importance, and node but found end of file")
+			state.add_error("Expected tag name, importance, and node but found end of file")
 			return
 		tag_name = state.parse_name()
 		value = ValueOrGDScriptNode.new()
@@ -405,5 +431,56 @@ class TagNode extends AstNode:
 	func _to_string() -> String:
 		return str("Task ", tag_name, " ", value, " ")
 
-#class OptionNode extends AstNode:
-	#var option_names
+
+
+class OptionNode extends AstNode:
+	var option_names: Array[TextNode] = []
+	var blocks: Array[BlockNode] = []
+	
+	func parse(state: ParseState) -> void:
+		state.lstrip()
+		if state.text.is_empty():
+			state.add_error("Expected {, but found end of file")
+			return
+		if state.text[0] != "{":
+			state.add_error(str("Expected {, but found ", state.text[0]))
+			return
+		state.text = state.text.substr(1)
+		while true:
+			state.lstrip()
+			if state.text.is_empty():
+				state.add_error("Expected ! or } in Option, but found end of file")
+				return
+			if state.text[0] == "!":
+				state.text = state.text.substr(1)
+				var success = parse_part(state)
+				if not success: return
+			elif state.text[0] == "}":
+				state.text = state.text.substr(1)
+				return
+			else:
+				state.add_error(str("Expected ! or } in option block, but found ", state.text[0]))
+				return
+	
+	func parse_part(state: ParseState) -> bool:
+		var option_name: TextNode = TextNode.new()
+		option_name.parse(state)
+		option_names.push_back(option_name)
+		state.lstrip()
+		if state.text.is_empty():
+				state.add_error("Expected { in Option, but found end of file")
+				return false
+		if state.text[0] != "{":
+			state.add_error(str("Expected {, but found ", state.text[0]))
+			return false
+		state.text = state.text.substr(1)
+		var block: BlockNode = BlockNode.new()
+		block.parse(state)
+		blocks.push_back(block)
+		return true
+	
+	func _to_string() -> String:
+		var result: String = ""
+		for index in range(len(blocks)):
+			result += str("!", option_names[index], "! ", blocks[index], "\n")
+		return str("Option {\n", NewNewAST.indent_string(result.rstrip(" \t\n")), "\n} ")

@@ -25,7 +25,12 @@ offset_bottom = 630.0
 text = "!I have \\d$random()$. I'm rich\\x
 {
 	!Meow
-}"
+}
+
+Option {
+
+}
+"
 placeholder_text = "!Haiiiiii World\\x"
 minimap_draw = true
 minimap_width = 20
@@ -69,20 +74,206 @@ offset_top = 26.0
 offset_right = 1127.0
 offset_bottom = 427.0
 
-[node name="Label3" type="Label" parent="."]
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
 layout_mode = 0
-offset_left = 348.0
-offset_top = 381.0
-offset_right = 1139.0
-offset_bottom = 631.0
-text = "- Implement OptionNode
-      - Do so by modifying Say to use more general TextNode (or some other name)
-- Design and Implement Task Modifiers & tags
-      - More ergonomic ways of modifying the importance value than a signle funciton
+offset_left = 337.32
+offset_top = 406.0
+offset_right = 1152.0
+offset_bottom = 643.0
+horizontal_scroll_mode = 0
+
+[node name="Label4" type="Label" parent="ScrollContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "- Design and Implement Task Modifiers & tags
+      - More ergonomic/preformant ways of modifying the importance value than a signle funciton
 - Implement Runtime
       - first convert from AST's nodes to runtime instructions
       - do more error  checking in that process
 - Syntax Highlighter??????
-- DO NOT REDESIGN THE ENTIRE LANGUAGE AGAIN!!!!!!"
+- Automated Tests?
+- DO NOT REDESIGN THE ENTIRE LANGUAGE AGAIN!!!!!!
+
+
+
+
+
+======= Documentation ==========
+General infoz:
+A dialogue system - designed for utility AI agents
+allowing any thing to be interupted at any moment and handle that gracefully
+Does not use ;
+When you get an error message, the first is definitly accurate - after than there is a good chance its meaningless
+
+
+
+====Scope====
+Anything inside a block { } is scoped the same (even if in oposite order)
+Something defined inside a block is not accessable from something outside the block
+Shadowing is illegal
+
+
+
+====Comments=====
+// single line comment
+/* block comment */
+{
+	// block scope
+} 
+
+
+====Run code====
+// no return value wanted here
+$foo()
+$bar()$ $qux()$
+$#cheese$ // will only be called the first time
+
+// do have blocking code in the gdscript!!!
+
+
+====Await====
+Await $signal_name$
+Will await for the signal
+But will also continue to process utilities of other task
+So if needs to be interupted with a higher priority task, will do that and stop worring about the signal
+
+
+
+====Say====
+!Say this stuff
+!Use GDscript to say a random number: $random()$
+!Use \\d for dollar signs and \\x for explanation points
+!This is!  !Two different says!
+
+
+
+
+
+====Control Flow====
+If $condition$ {
+	!Condition is true
+} else {
+	!Condition is false
+}
+If $condition2$ !Condition2 is true! else !Condition2 is false!
+
+// Note all key words use TitleCase
+
+!This will loop
+Loop {
+	!forever
+	!and
+}
+
+While $condition3$ {}
+Until $condition4$ {}
+
+Loop {
+	// foo will be called each iteration
+	$foo()
+	// bar will only be called once
+	// if the value from bar is used by something, it will be cached and reused each following time for the rest of eternity
+	$#bar()
+}
+
+Once {
+	!This will happen the first time
+} Else {
+	!This will happen every other time
+}
+
+
+====Tasks====
+// Tasks are like functions, but the happen and interupt each other as the utility AI does its magics
+
+Task generic_task_name 15 {
+	!15 is the \"importance\" of the task?
+	!Higher importance means it will go before a task of a lower importance
+	// GDscript can be used instead of fixed number
+	//Task generic_task_name $15 + sin(time * 6.283) * 2$ {
+	
+	!At this point if the task got interupted when it comes back, it will go back to the begining
+	TaskCheckpoint {}
+	!Now the task will return to this point
+	
+   // If saying AAA then interacted (will say BBB) then switch task, then switch back (require interaction till get back to AA then BBB)
+	// Interact again will say DDD
+	//if lose interset in task then return
+	// instead of going directly to DDD, will first say CCC
+	!AAA
+	!BBB
+	TaskCheckpoint !CCC
+	!DDD
+
+	TaskCheckpoint {
+		!This works to
+		!obvs
+	}
+
+	if $should_end_early$
+		TaskEnd // Like return
+
+	!When a task is ended, it will immediatly switch to anouther task, and never consider this task again
+
+	!The end of the Task has an implicit TaskEnd
+}
+
+// all that code does not do anything until the task is added
+
+TaskAdd generic_task_name
+// If that task has a priority higher than the current task, it will immediatly switch to it
+
+
+====Tags====
+// Tags provide extra infoz to the instruction in scope after it
+// They can be used to mark which character says a specific line, the facial expression for a given line
+// They can also be used to temporarily override the priority of a some lines
+// the tag_name
+
+Tag tag_name Value
+// foo will be called each time the tagged thing needs to access it
+Tag tag_name2 $foo()$
+// bar will be called once, then the value will be reused each time
+Tag tag_name3 $#bar()$ 
+!foo and bar will be called when this line here executes
+!only foo is called, value from bar is reused
+
+{
+	Tag tag_name4 $this_will_never_be_called()$
+}
+
+
+Tag Expression Happy
+!Happy
+{
+	!Happy
+	Tag Expression Sad
+	!Sad
+}
+!Happy
+if $condition$
+	Tag expression Angry
+!Still happy (Tag still happened in scope)
+
+How tags are applied is evaluated before runtime - you cant do any fancy, apply tag A or B depending on a situation - if you need that use a tag that has a GDscript evaluation
+
+
+
+====Importance Tag====
+// it takes no other task with importance >500 to switch to this task
+Task task_name 500 {
+	Tag importance 509
+	!Stay in this task unless a task of over 509 comes up
+	{
+		Tag importance 704
+		!This is of greater importance to say in one go
+		TaskCheckpoint {} // Put the checkpoint instead of of the thing
+	}
+	!The importance is now 509 again, if there was a task of 601 or whatever, it would eject after this message
+	TaskEnd
+}"
+autowrap_mode = 3
+tab_stops = PackedFloat32Array(32)
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

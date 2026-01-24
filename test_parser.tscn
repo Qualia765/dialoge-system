@@ -66,6 +66,7 @@ offset_top = 22.0
 offset_right = 734.0
 offset_bottom = 427.0
 label_settings = SubResource("LabelSettings_0xm2m")
+tab_stops = PackedFloat32Array(32)
 
 [node name="Label2" type="Label" parent="."]
 layout_mode = 0

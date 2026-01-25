@@ -152,7 +152,6 @@ static func indent_string(input: String) -> String:
 	return result
 
 
-
 class RootNode extends AstNode:
 	var nodes: Array[AstNode] = []
 	func parse(state: ParseState) -> void:

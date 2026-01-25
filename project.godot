@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="custom dialoge system"
-run/main_scene="res://test_parser.tscn"
+run/main_scene="uid://dyldd7uxm3tgq"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 

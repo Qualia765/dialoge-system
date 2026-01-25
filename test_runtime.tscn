@@ -8,10 +8,12 @@ font_names = PackedStringArray("Monospace")
 [sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
 font = SubResource("SystemFont_ig7tw")
 
-[node name="Main" type="Control"]
+[node name="Main" type="Control" node_paths=PackedStringArray("label", "button")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_e2ne1")
+label = NodePath("Label")
+button = NodePath("Button2")
 
 [node name="Button" type="Button" parent="."]
 layout_mode = 0
@@ -21,19 +23,21 @@ offset_right = 173.0
 offset_bottom = 57.0
 text = "Run!"
 
+[node name="Button2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 233.0
+offset_top = 21.0
+offset_right = 274.0
+offset_bottom = 54.0
+text = "Test"
+
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
-offset_left = 354.0
-offset_top = 22.0
-offset_right = 734.0
-offset_bottom = 427.0
+offset_left = 22.0
+offset_top = 75.0
+offset_right = 1110.0
+offset_bottom = 620.0
 label_settings = SubResource("LabelSettings_0xm2m")
-
-[node name="Label2" type="Label" parent="."]
-layout_mode = 0
-offset_left = 747.0
-offset_top = 26.0
-offset_right = 1127.0
-offset_bottom = 427.0
+tab_stops = PackedFloat32Array(32)
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

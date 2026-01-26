@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://qpah81fwwhyf"]
 
-[ext_resource type="Script" uid="uid://buyon2wbhx5ac" path="res://test_parser.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://buyon2wbhx5ac" path="res://testing/test_parser.gd" id="1_ig7tw"]
 
 [sub_resource type="SystemFont" id="SystemFont_ig7tw"]
 font_names = PackedStringArray("Monospace")

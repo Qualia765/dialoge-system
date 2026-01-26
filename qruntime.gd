@@ -3,8 +3,8 @@ extends RefCounted
 
 
 # Instructions to have:
-# GDscript node DONE
-# await GDscript DONE
+# Expression node DONE
+# await Expression DONE
 # Say
 # Option
 # Goto DONE
@@ -21,22 +21,22 @@ class Runtime:
 	var current_instruction: int = 0
 	var async_signal: Signal = Signal()
 	var error_msg: String = ""
-	var gdscript_varrible_names: PackedStringArray = []
-	var gdscript_varible_values: Array = []
-	var gdscript_base_instance: Object = null
+	var expression_varrible_names: PackedStringArray = []
+	var expression_varible_values: Array = []
+	var expression_base_instance: Object = null
 	
 	signal completed
 	
 	func _init(
 		instructions_: Array[Instruction] = [],
-		gdscript_varrible_names_: PackedStringArray = [],
-		gdscript_varible_values_: Array = [],
-		gdscript_base_instance_: Object = null
+		expression_varrible_names_: PackedStringArray = [],
+		expression_varible_values_: Array = [],
+		expression_base_instance_: Object = null
 	):
 		instructions = instructions_
-		gdscript_varrible_names = gdscript_varrible_names_
-		gdscript_varible_values = gdscript_varible_values_
-		gdscript_base_instance = gdscript_base_instance_
+		expression_varrible_names = expression_varrible_names_
+		expression_varible_values = expression_varible_values_
+		expression_base_instance = expression_base_instance_
 		
 		for instruction in instructions:
 			instruction.rt_initalize(self)
@@ -63,7 +63,7 @@ class Runtime:
 	
 	## should only be connected to the signal in async_signal
 	## not to be called under other circumstances
-	func _async_recieve() -> void:
+	func _async_recieve(...__) -> void: # ...__ lets it take any number of arguments - which it will completly ignore
 		_disconnect_signal()
 		current_instruction += 1
 		execute()
@@ -83,40 +83,40 @@ class Runtime:
 			_disconnect_signal()
 
 
-## if its a value, inistalize with ValueOrGDScript.new(5)
-## if its gdscript initalize with ValueOrGDScript.new("random()", true)
-## if its only evaulated once use ValueOrGDScript.new("random()", true, true)
-class ValueOrGDScript:
+## if its a value, inistalize with ValueOrExpression.new(5)
+## if its expression initalize with ValueOrExpression.new("random()", true)
+## if its only evaulated once use ValueOrExpression.new("random()", true, true)
+class ValueOrExpression:
 	var value: Variant
-	var is_gd_script: bool
+	var is_expression: bool
 	var cache_result: bool
-	func _init(value_: Variant, is_gd_script_: bool = false, cache_result_: bool = false) -> void:
+	func _init(value_: Variant, is_expression_: bool = false, cache_result_: bool = false) -> void:
 		value = value_
-		is_gd_script = is_gd_script_
+		is_expression = is_expression_
 		cache_result = cache_result_
-		if is_gd_script_:
-			assert(value_ is String, "if its gdscript, value must be a string")
+		if is_expression_:
+			assert(value_ is String, "if its expression, value must be a string")
 		else:
-			assert(not cache_result, "cant cache the result if its not gdscript")
+			assert(not cache_result, "cant cache the result if its not expression")
 	
 	func rt_initalize(runtime: Runtime, dbg_ln: int) -> void:
-		if is_gd_script:
+		if is_expression:
 			assert(runtime != null)
 			var command = value
 			value = Expression.new()
-			var error: Error = value.parse(command, runtime.gdscript_varrible_names)
+			var error: Error = value.parse(command, runtime.expression_varrible_names)
 			if error != OK:
 				push_error(value.get_error_text())
-				runtime.add_error(dbg_ln, str("Error parsing GDScript: error code ", error))
+				runtime.add_error(dbg_ln, str("Error parsing Expression: error code ", error))
 	
 	func get_value(runtime: Runtime, dbg_ln: int) -> Variant:
-		if is_gd_script:
-			var result = value.execute(runtime.gdscript_varible_values, runtime.gdscript_base_instance)
+		if is_expression:
+			var result = value.execute(runtime.expression_varible_values, runtime.expression_base_instance)
 			if value.has_execute_failed():
-				runtime.add_error(dbg_ln, "GDScript Execution Failed")
+				runtime.add_error(dbg_ln, "Expression Execution Failed")
 				result = null
 			if cache_result:
-				is_gd_script = false
+				is_expression = false
 				cache_result = false
 				value = result
 			return result
@@ -133,14 +133,14 @@ class ValueOrGDScript:
 
 
 
-class InstructionGDScript extends Instruction:
-	var expression: ValueOrGDScript = null
+class InstructionExpression extends Instruction:
+	var expression: ValueOrExpression = null
 	var await_result: bool = false
 	
-	func _init(command: String = "", await_result_: bool = false, dbg_ln_: int = -1) -> void:
+	func _init(dbg_ln_: int, command: String = "", await_result_: bool = false) -> void:
 		dbg_ln = dbg_ln_
 		await_result = await_result_
-		expression = ValueOrGDScript.new(command, true)
+		expression = ValueOrExpression.new(command, true)
 	
 	func rt_initalize(runtime: Runtime) -> void:
 		expression.rt_initalize(runtime, dbg_ln)
@@ -154,22 +154,22 @@ class InstructionGDScript extends Instruction:
 			return null
 		else:
 			if result != null:
-				runtime.add_error(dbg_ln, "GDScript returned non-null result")
+				runtime.add_error(dbg_ln, "Expression returned non-null result")
 			return null
 
 
 
 class InstructionGotoIf extends Instruction:
 	var next_instruction: int = 0
-	var condition: ValueOrGDScript
+	var condition: ValueOrExpression
 	var else_instruction: int = -1
 	
-	func _init(next_instruction_: int, condition_: ValueOrGDScript = null, else_instruction_: int = -1, dbg_ln_: int = -1):
+	func _init(dbg_ln_: int, next_instruction_: int, condition_: ValueOrExpression = null, else_instruction_: int = -1):
 		dbg_ln = dbg_ln_
 		next_instruction = next_instruction_
 		else_instruction = else_instruction_
 		if condition_ == null:
-			condition = ValueOrGDScript.new(true)
+			condition = ValueOrExpression.new(true)
 		else:
 			condition = condition_
 	

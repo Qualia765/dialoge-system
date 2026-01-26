@@ -2,7 +2,7 @@ extends Control
 
 
 @export var label: Label
-@export var button: Button
+@export var button: BaseButton
 
 func _on_button_pressed() -> void:
 	await test1()
@@ -13,7 +13,7 @@ func _on_button_pressed() -> void:
 	await test6()
 	await test7()
 	label.text = "Tests Passed!"
-	
+
 
 
 func test1():
@@ -25,8 +25,8 @@ func test1():
 func test2():
 	label.text = ""
 	var runtime: QRuntime.Runtime = QRuntime.Runtime.new([
-		QRuntime.InstructionGDScript.new("fake_print('Hello')", false, 1),
-		QRuntime.InstructionGDScript.new("fake_print(str('Hello', foo))", false, 2),
+		QRuntime.InstructionExpression.new(1, "fake_print('Hello')", false),
+		QRuntime.InstructionExpression.new(2, "fake_print(str('Hello', foo))", false),
 	], ["foo"], [2], self)
 	assert(runtime.execute(), "done")
 	assert(runtime.error_msg == "", "no error")
@@ -36,9 +36,9 @@ func test2():
 func test3():
 	label.text = ""
 	var runtime: QRuntime.Runtime = QRuntime.Runtime.new([
-		QRuntime.InstructionGDScript.new("fake_print('Press Button To Continue')", false, 1),
-		QRuntime.InstructionGDScript.new("button.pressed", true, 2),
-		QRuntime.InstructionGDScript.new("fake_print('You Pressed The Button')", false, 3),
+		QRuntime.InstructionExpression.new(1, "fake_print('Press Button To Continue')", false),
+		QRuntime.InstructionExpression.new(2, "button.pressed", true),
+		QRuntime.InstructionExpression.new(3, "fake_print('You Pressed The Button')", false),
 	], [], [], self)
 	assert(not runtime.execute(), "shouldn't yet be done")
 	await runtime.completed
@@ -48,7 +48,7 @@ func test3():
 
 func test4():
 	var runtime: QRuntime.Runtime = QRuntime.Runtime.new([
-		QRuntime.InstructionGDScript.new("(", false, 1),
+		QRuntime.InstructionExpression.new(1, "(", false),
 	])
 	assert(runtime.execute(), "done")
 	assert(runtime.error_msg != "", "Errored")
@@ -56,14 +56,14 @@ func test4():
 
 func test5():
 	var runtime: QRuntime.Runtime = QRuntime.Runtime.new([
-		QRuntime.InstructionGDScript.new("5", false, 1),
+		QRuntime.InstructionExpression.new(1, "5", false),
 	])
 	assert(runtime.execute(), "done")
 	assert(runtime.error_msg != "", "Errored")
 
 func test6():
 	var runtime: QRuntime.Runtime = QRuntime.Runtime.new([
-		QRuntime.InstructionGDScript.new("5", true, 1),
+		QRuntime.InstructionExpression.new(1, "5", true),
 	])
 	assert(runtime.execute(), "done")
 	assert(runtime.error_msg != "", "Errored")
@@ -72,9 +72,9 @@ func test7():
 	foo = 0
 	label.text = ""
 	var runtime: QRuntime.Runtime = QRuntime.Runtime.new([
-		QRuntime.InstructionGDScript.new("set('foo', foo+1)", false, 0),
-		QRuntime.InstructionGotoIf.new(0, QRuntime.ValueOrGDScript.new("foo < 3", true), 1),
-		QRuntime.InstructionGDScript.new("fake_print(str('Foo:', foo))", false, 2),
+		QRuntime.InstructionExpression.new(1, "set('foo', foo+1)", false),
+		QRuntime.InstructionGotoIf.new(2, 0, QRuntime.ValueOrExpression.new("foo < 3", true)),
+		QRuntime.InstructionExpression.new(3, "fake_print(str('Foo:', foo))", false),
 	], [], [], self)
 	assert(runtime.error_msg == "", "no error")
 	assert(runtime.execute(), "done")

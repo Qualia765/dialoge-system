@@ -1,0 +1,72 @@
+[gd_scene load_steps=7 format=3 uid="uid://dyldd7uxm3tgq"]
+
+[ext_resource type="Texture2D" uid="uid://ckijrm08ybcxj" path="res://testing/floor-plan.jpg" id="2_ctdq0"]
+[ext_resource type="Texture2D" uid="uid://c416yp70mqcu6" path="res://icon.svg" id="2_ev2vu"]
+[ext_resource type="Script" uid="uid://jt0a4cr4qhtb" path="res://testing/bestie.gd" id="3_dnir5"]
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_dnir5"]
+vertices = PackedVector2Array(162.88281, 467.0078, 74.28125, 466, 74.28906, 466, 576.22656, 369, 580.7578, 561, 548.85156, 547, 549.89844, 475.8828, 550.22656, 454, 419, 561, 448, 547, 53.921875, 388.85938, 151.63281, 391.10156, 138.39063, 402, 62.609375, 402, 50.453125, 465.28906, 64.38281, 448, 490.29688, 369, 551.14844, 391.8828, 487.15625, 385.75, 153.28125, 458.4922, 136.61719, 448, 178, 469.53125, 179.5, 454.7422, 270, 471.40625, 394.03125, 376.8125, 400.42188, 375.0625, 398.0078, 385.3125, 394.2578, 388.32813, 446, 454, 448, 477.1172, 419, 398.22656, 422.32813, 391.39063, 423.64063, 382.21094, 455.52344, 382.9922, 446, 393.1172, 45, 617.4375, 45, 605.9922, 61.179688, 607.53906, 69.390625, 618.5469, 180.34375, 440.4297, 188, 441.53125, 107.60156, 617.3828, 101, 617.6172, 101, 600, 105.578125, 566.59375, 104, 525.1875, 70.53125, 588.9219, 56.296875, 578.0625, 333.77344, 522.1328, 334.72656, 559.8906, 253.24219, 559.09375, 254.24219, 517.1328, 270, 497.6875, 321.89063, 499.3125, 347, 133, 412.78125, 133, 412.1875, 160.46875, 371.5078, 162.50781, 347, 180, 373.5, 202.15625, 50, 576.78906, 50, 524.1797, 377.5703, 337.03125, 57.117188, 336.03125, 58.882813, 188.96094, 336.35156, 187.99219, 436.21875, 251.22656, 399.8125, 306.4922, 521.85156, 249, 522.85156, 180.8125, 555.15625, 180.1875, 557.8281, 337, 527.3906, 265.34375, 485.25, 181, 496, 181, 496, 249, 483.22656, 201.1875, 135.52344, 516.7031, 104, 500, 153.22656, 500, 156.21875, 507.46875, 148, 511.79688, 188, 381.92188, 293.09375, 381.0703, 293.90625, 470.40625, 391.17188, 560.8125, 358, 560.1797, 358, 543.2969, 373.85938, 540.3281, 376.17188, 402, 132.57813, 567.6328, 434.3672, 201.15625, 350.6797, 402.02344, 351.64844, 375, 375.46094, 375, 352.09375, 402, 479.09375, 202.10156, 485, 230.24219, 148, 515.7422, 472.79688, 337, 470.90625, 346.40625, 459.60156, 345.6328, 458.14063, 312.22656, 464.14063, 304.53906, 322.89844, 404.9922, 351.0703, 520.09375, 401.5703, 341.8828, 391.28906, 343.9375, 172.67969, 516.10156, 171.39844, 507.1172, 178, 500.21094, 466.71094, 294.85938, 521.0469, 293.85156, 67.74219, 597.1328, 437.53906, 262.8672, 485, 251, 446.67188, 256.5703, 478.17188, 222.42969, 455.03125, 251)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2), PackedInt32Array(3, 4, 5, 6, 7), PackedInt32Array(5, 4, 8, 9), PackedInt32Array(10, 11, 12, 13), PackedInt32Array(14, 10, 13, 15), PackedInt32Array(16, 3, 17, 18), PackedInt32Array(12, 11, 19, 20), PackedInt32Array(0, 2, 14, 15, 20, 19), PackedInt32Array(21, 0, 19, 22, 23), PackedInt32Array(24, 25, 26, 27), PackedInt32Array(28, 29, 9, 8, 30, 31), PackedInt32Array(32, 33, 18, 17, 34, 31), PackedInt32Array(35, 36, 37, 38), PackedInt32Array(22, 39, 40, 23), PackedInt32Array(41, 42, 43, 44), PackedInt32Array(45, 44, 43, 46, 47), PackedInt32Array(48, 49, 50, 51, 52, 53), PackedInt32Array(54, 55, 56, 57), PackedInt32Array(58, 54, 57, 59), PackedInt32Array(60, 61, 45, 47), PackedInt32Array(62, 63, 64, 65, 59, 66, 67), PackedInt32Array(68, 69, 70, 71, 72), PackedInt32Array(73, 74, 75, 76), PackedInt32Array(77, 45, 78, 79, 80, 81), PackedInt32Array(82, 83, 84, 23, 40), PackedInt32Array(85, 86, 87, 88), PackedInt32Array(27, 85, 88, 89), PackedInt32Array(77, 90, 44, 45), PackedInt32Array(59, 91, 66), PackedInt32Array(92, 93, 94, 95), PackedInt32Array(96, 76, 75, 97), PackedInt32Array(31, 34, 28), PackedInt32Array(81, 98, 77), PackedInt32Array(99, 100, 101, 102, 103), PackedInt32Array(48, 53, 104, 92, 95, 105), PackedInt32Array(67, 106, 107, 62), PackedInt32Array(52, 51, 108, 109, 110, 23), PackedInt32Array(110, 21, 23), PackedInt32Array(65, 58, 59), PackedInt32Array(99, 103, 111, 112, 71), PackedInt32Array(38, 37, 113), PackedInt32Array(46, 38, 113), PackedInt32Array(46, 113, 47), PackedInt32Array(109, 81, 80, 110), PackedInt32Array(89, 95, 94, 27), PackedInt32Array(24, 27, 94, 62, 107), PackedInt32Array(71, 112, 72), PackedInt32Array(75, 68, 72, 114, 115), PackedInt32Array(7, 17, 3), PackedInt32Array(28, 7, 6, 29), PackedInt32Array(26, 31, 30, 27), PackedInt32Array(114, 67, 66), PackedInt32Array(114, 66, 116), PackedInt32Array(97, 117, 96), PackedInt32Array(115, 97, 75), PackedInt32Array(118, 115, 114, 116)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(49, 179, 47, 346, 367, 347, 366, 365, 342, 365, 341, 393, 313, 396, 312, 489, 280, 488, 280, 481, 304, 480, 303, 371, 178, 372, 178, 430, 171, 429, 170, 446, 163, 447, 161, 365, 149, 365, 147, 381, 60, 379, 60, 366, 45, 365, 40, 475, 74, 476, 74, 438, 73, 412, 128, 412, 127, 438, 74, 438, 74, 476, 162, 477, 168, 478, 168, 493, 162, 495, 160, 490, 94, 490, 94, 515, 40, 514, 40, 585, 50, 587, 56, 597, 35, 595, 35, 627, 79, 629, 80, 603, 91, 607, 91, 628, 118, 627, 116, 577, 142, 578, 145, 526, 158, 525, 158, 520, 163, 519, 164, 526, 244, 527, 243, 569, 345, 570, 344, 531, 361, 529, 362, 412, 366, 412, 364, 532, 348, 535, 348, 570, 401, 571, 404, 403, 409, 405, 409, 571, 591, 571, 586, 359, 482, 359, 479, 375, 456, 373, 456, 403, 541, 402, 539, 537, 458, 537, 458, 487, 540, 486, 541, 444, 456, 444, 456, 373, 415, 372, 414, 379, 410, 378, 414, 361, 403, 364, 402, 352, 412, 350, 410, 310, 442, 273, 515, 275, 513, 284, 459, 285, 455, 300, 448, 309, 450, 355, 479, 357, 481, 347, 568, 347, 565, 170, 513, 171, 512, 239, 506, 239, 506, 171, 452, 171, 453, 178, 475, 183, 474, 193, 456, 197, 455, 202, 469, 204, 468, 226, 475, 234, 475, 241, 452, 241, 446, 245, 444, 191, 383, 192, 382, 172, 422, 170, 423, 123, 337, 123, 337, 175, 333, 178)])
+
+[sub_resource type="SystemFont" id="SystemFont_ig7tw"]
+font_names = PackedStringArray("Monospace")
+
+[sub_resource type="LabelSettings" id="LabelSettings_0xm2m"]
+font = SubResource("SystemFont_ig7tw")
+font_size = 39
+outline_size = 6
+outline_color = Color(0, 0, 0, 0.7764706)
+shadow_size = 12
+shadow_color = Color(0, 0, 0, 0.3647059)
+shadow_offset = Vector2(0, 0)
+
+[node name="Main" type="Node2D"]
+
+[node name="FloorPlan" type="Sprite2D" parent="."]
+position = Vector2(1153.5, 1063.0001)
+scale = Vector2(2.291, 2.275785)
+texture = ExtResource("2_ctdq0")
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="FloorPlan"]
+position = Vector2(-513.1363, -517.71857)
+scale = Vector2(1.6420361, 1.4941373)
+navigation_polygon = SubResource("NavigationPolygon_dnir5")
+
+[node name="Bestie" type="Node2D" parent="." node_paths=PackedStringArray("label", "nav_agent")]
+position = Vector2(175, 1958)
+script = ExtResource("3_dnir5")
+label = NodePath("Button2/Label")
+nav_agent = NodePath("NavigationAgent2D")
+
+[node name="Button2" type="TextureButton" parent="Bestie"]
+offset_left = -62.0
+offset_top = -61.0
+offset_right = 66.0
+offset_bottom = 67.0
+texture_normal = ExtResource("2_ev2vu")
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Bestie/Button2"]
+layout_mode = 0
+offset_left = -233.0
+offset_top = -171.0
+offset_right = 369.0
+offset_bottom = -3.0
+text = "Hello This is my house I hope you like it here :D"
+label_settings = SubResource("LabelSettings_0xm2m")
+horizontal_alignment = 1
+vertical_alignment = 2
+autowrap_mode = 3
+tab_stops = PackedFloat32Array(32)
+visible_characters_behavior = 1
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="Bestie"]
+path_desired_distance = 40.0
+path_postprocessing = 2
+debug_enabled = true
+
+[node name="Camera2D" type="Camera2D" parent="Bestie"]
+
+[connection signal="pressed" from="Bestie/Button2" to="Bestie" method="_on_button_2_pressed"]
+[connection signal="navigation_finished" from="Bestie/NavigationAgent2D" to="Bestie" method="_on_navigation_agent_2d_navigation_finished"]

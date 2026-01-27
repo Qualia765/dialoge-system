@@ -63,7 +63,6 @@ visible_characters_behavior = 1
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="Bestie"]
 path_desired_distance = 40.0
-path_postprocessing = 2
 debug_enabled = true
 
 [node name="Camera2D" type="Camera2D" parent="Bestie"]

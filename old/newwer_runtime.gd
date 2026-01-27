@@ -13,7 +13,7 @@ class ValueOrGDScript:
 	
 	func get_value() -> Variant:
 		if value is Expression:
-			return Runtime.eval(value)
+			return OldishRuntime.eval(value)
 		else:
 			return value
 
@@ -76,7 +76,7 @@ class Agent:
 class InstructionExecute extends Instruction:
 	var code: String
 	func execute() -> void:
-		Runtime.eval(code)
+		OldishRuntime.eval(code)
 
 
 

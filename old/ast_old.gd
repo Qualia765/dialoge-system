@@ -90,7 +90,7 @@ class _LineNameIterator:
 			return ""
 		var name_end: int = remain_text.find(" ")
 		var name: String = remain_text.substr(0, name_end)
-		if not AST.is_valid_name(name):
+		if not OldAST.is_valid_name(name):
 			error += str("Invalid name: '", name, "'\n")
 		remain_text = remain_text.substr(name_end).lstrip(" \t\r\n")
 		return name

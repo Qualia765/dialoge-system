@@ -24,6 +24,7 @@ class Runtime:
 	var expression_varrible_names: PackedStringArray = []
 	var expression_varible_values: Array = []
 	var expression_base_instance: Object = null
+	var say_function: Callable
 	
 	signal completed
 	
@@ -31,7 +32,7 @@ class Runtime:
 		instructions_: Array[Instruction] = [],
 		expression_varrible_names_: PackedStringArray = [],
 		expression_varible_values_: Array = [],
-		expression_base_instance_: Object = null
+		expression_base_instance_: Object = null,
 	):
 		instructions = instructions_
 		expression_varrible_names = expression_varrible_names_
@@ -40,6 +41,9 @@ class Runtime:
 		
 		for instruction in instructions:
 			instruction.rt_initalize(self)
+		
+		if expression_base_instance_ != null and expression_base_instance_.has_method(&"_say"):
+			say_function = expression_base_instance_._say
 	
 	func add_error(line_num: int, msg: String) -> void:
 		error_msg += str("Line ", line_num, ": ", msg, "\n")
@@ -90,7 +94,7 @@ class ValueOrExpression:
 	var value: Variant
 	var is_expression: bool
 	var cache_result: bool
-	func _init(value_: Variant, is_expression_: bool = false, cache_result_: bool = false) -> void:
+	func _init(value_: Variant = null, is_expression_: bool = false, cache_result_: bool = false) -> void:
 		value = value_
 		is_expression = is_expression_
 		cache_result = cache_result_
@@ -122,6 +126,15 @@ class ValueOrExpression:
 			return result
 		else:
 			return value
+	
+	static func make_string_from_array(voes: Array[ValueOrExpression], runtime: Runtime, dbg_ln: int) -> String:
+		var result := ""
+		for voe in voes:
+			result += str(voe.get_value(runtime, dbg_ln))
+		return result
+
+
+
 
 
 
@@ -137,10 +150,13 @@ class InstructionExpression extends Instruction:
 	var expression: ValueOrExpression = null
 	var await_result: bool = false
 	
-	func _init(dbg_ln_: int, command: String = "", await_result_: bool = false) -> void:
+	func _init(dbg_ln_: int, expression_: ValueOrExpression = null, await_result_: bool = false) -> void:
 		dbg_ln = dbg_ln_
 		await_result = await_result_
-		expression = ValueOrExpression.new(command, true)
+		if expression_ == null:
+			expression = ValueOrExpression.new()
+		else:
+			expression = expression_
 	
 	func rt_initalize(runtime: Runtime) -> void:
 		expression.rt_initalize(runtime, dbg_ln)
@@ -187,3 +203,27 @@ class InstructionGotoIf extends Instruction:
 			if else_instruction != -1:
 				runtime.current_instruction = else_instruction - 1
 		return null
+
+
+
+class InstructionSay extends Instruction:
+	var voes: Array[ValueOrExpression]
+	func _init(dbg_ln_: int, voes_: Array[ValueOrExpression] = []) -> void:
+		dbg_ln = dbg_ln_
+		voes = voes_
+	
+	func rt_initalize(runtime: Runtime) -> void:
+		for voe in voes:
+			voe.rt_initalize(runtime, dbg_ln)
+	
+	func _complain_about_lack_of_say(runtime: Runtime):
+		runtime.add_error(dbg_ln, "Can not use 'say' instruction if base instance does not have _say method")
+	
+	func execute(runtime: Runtime) -> Variant:
+		if runtime.say_function.is_null():
+			_complain_about_lack_of_say(runtime)
+			return
+		var result = ValueOrExpression.make_string_from_array(voes, runtime, dbg_ln)
+		return null
+	
+	

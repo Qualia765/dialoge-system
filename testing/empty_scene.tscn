@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=3 uid="uid://dxk0ereoyrd81"]
+
+[ext_resource type="Script" uid="uid://cj273q4fbdpdf" path="res://testing/understand_await.gd" id="1_i7rhi"]
+
+[node name="Node" type="Control" node_paths=PackedStringArray("switch_task_button")]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_i7rhi")
+switch_task_button = NodePath("SwitchTaskButton")
+
+[node name="SwitchTaskButton" type="Button" parent="."]
+layout_mode = 0
+offset_left = 70.0
+offset_top = 84.0
+offset_right = 302.0
+offset_bottom = 266.0
+text = "Switch
+Task"
+
+[node name="NextButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 360.0
+offset_top = 83.0
+offset_right = 592.0
+offset_bottom = 265.0
+text = "Next"
+
+[connection signal="pressed" from="SwitchTaskButton" to="." method="task_switch"]

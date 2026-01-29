@@ -39,11 +39,12 @@ class Runtime:
 		expression_varible_values = expression_varible_values_
 		expression_base_instance = expression_base_instance_
 		
+		if (expression_base_instance_ != null) and (expression_base_instance_.has_method(&"_say")):
+			say_function = expression_base_instance_._say
+		
 		for instruction in instructions:
 			instruction.rt_initalize(self)
-		
-		if expression_base_instance_ != null and expression_base_instance_.has_method(&"_say"):
-			say_function = expression_base_instance_._say
+	
 	
 	func add_error(line_num: int, msg: String) -> void:
 		error_msg += str("Line ", line_num, ": ", msg, "\n")
@@ -55,8 +56,9 @@ class Runtime:
 		while current_instruction < len(instructions):
 			var result: Variant = instructions[current_instruction].execute(self)
 			if result is Signal:
-				_connect_signal(result)
-				return false
+				if not result.is_null():
+					_connect_signal(result)
+					return false
 			else:
 				assert(result == null, "Instructions must return Signal or null")
 			current_instruction += 1
@@ -208,22 +210,27 @@ class InstructionGotoIf extends Instruction:
 
 class InstructionSay extends Instruction:
 	var voes: Array[ValueOrExpression]
-	func _init(dbg_ln_: int, voes_: Array[ValueOrExpression] = []) -> void:
+	var await_result: bool = true
+	func _init(dbg_ln_: int, voes_: Array[ValueOrExpression] = [], await_result_: bool = true) -> void:
 		dbg_ln = dbg_ln_
 		voes = voes_
+		await_result = await_result_
 	
 	func rt_initalize(runtime: Runtime) -> void:
+		if runtime.say_function.is_null():
+			runtime.add_error(dbg_ln, "Will not be able to use 'say' instruction if base instance does not have _say method")
 		for voe in voes:
 			voe.rt_initalize(runtime, dbg_ln)
 	
-	func _complain_about_lack_of_say(runtime: Runtime):
-		runtime.add_error(dbg_ln, "Can not use 'say' instruction if base instance does not have _say method")
-	
 	func execute(runtime: Runtime) -> Variant:
 		if runtime.say_function.is_null():
-			_complain_about_lack_of_say(runtime)
+			runtime.add_error(dbg_ln, "Can not use 'say' instruction if base instance does not have _say method")
 			return
-		var result = ValueOrExpression.make_string_from_array(voes, runtime, dbg_ln)
+		var what = ValueOrExpression.make_string_from_array(voes, runtime, dbg_ln)
+		var signal_result = runtime.say_function.call(what)
+		if not ((signal_result is Signal) or (signal_result == null)):
+			runtime.add_error(dbg_ln, "Expected Signal or null responce from _say on base instance")
+			return null
+		if await_result:
+			return signal_result
 		return null
-	
-	

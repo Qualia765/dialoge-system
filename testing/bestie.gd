@@ -8,28 +8,14 @@ var runtime: QRuntime.Runtime
 
 func _ready() -> void:
 	runtime = QRuntime.Runtime.new([
-		QRuntime.InstructionExpression.new(1, "say('Click Me')", true),
-		QRuntime.InstructionExpression.new(2, "say('wow! if you click me again, ill show you a trick')", true),
-		QRuntime.InstructionExpression.new(3, "say('')", false),
-		QRuntime.InstructionExpression.new(4, "go_to(LOCATION_THEATER)", true),
-		QRuntime.InstructionExpression.new(5, "say('Wow look at that, im here now')", true),
-		QRuntime.InstructionExpression.new(6, "say('Isn\\'t that so cool?')", true),
-		QRuntime.InstructionExpression.new(7, "say('Now I am going to go to the game room')", true),
-		QRuntime.InstructionExpression.new(8, "go_to(LOCATION_BILLIARDS)", false),
-		QRuntime.InstructionExpression.new(9, "say('I can also keep talking while walking')", true),
-		QRuntime.InstructionExpression.new(10, "say('Pretty nifty ehh?')", true),
-		QRuntime.InstructionExpression.new(11, "say('Ok now imma wait till i get there')", false),
-		QRuntime.InstructionExpression.new(12, "go_to(LOCATION_BILLIARDS)", true),
-		QRuntime.InstructionExpression.new(13, "say('The Great and Powerful Godot Icon has arived!')", true),
-		QRuntime.InstructionExpression.new(14, "say('to play with some balls...')", true),
-		QRuntime.InstructionExpression.new(15, "say('thats kinda weird actually')", true),
-		QRuntime.InstructionExpression.new(16, "go_to(LOCATION_KITCHEN)", false),
-		QRuntime.InstructionExpression.new(17, "say('imma dip')", true),
-		QRuntime.InstructionExpression.new(18, "say('and by dip i mean make some food')", true),
-		QRuntime.InstructionExpression.new(19, "say('in the kitchen')", true),
-		QRuntime.InstructionExpression.new(20, "go_to(LOCATION_KITCHEN)", true),
-		QRuntime.InstructionExpression.new(21, "say('oh yea - eating time')", true),
-		QRuntime.InstructionExpression.new(22, "say('')", false),
+		QRuntime.InstructionSay.new(0, [QRuntime.ValueOrExpression.new("Click Me!!!")]),
+		QRuntime.InstructionSay.new(1, [QRuntime.ValueOrExpression.new("wow! if you click me again, ill show you a trick")]),
+		QRuntime.InstructionSay.new(2, [QRuntime.ValueOrExpression.new("randf(): "), QRuntime.ValueOrExpression.new("randf()", true), QRuntime.ValueOrExpression.new("!")]),
+		QRuntime.InstructionSay.new(3, [], false),
+		QRuntime.InstructionExpression.new(4, QRuntime.ValueOrExpression.new("go_to(LOCATION_THEATER)", true), true),
+		QRuntime.InstructionExpression.new(5, QRuntime.ValueOrExpression.new("_say('Wow look at that, im here now')", true), true),
+		QRuntime.InstructionExpression.new(6, QRuntime.ValueOrExpression.new("_say('Isn\\'t that so cool?')", true), true),
+		QRuntime.InstructionExpression.new(7, QRuntime.ValueOrExpression.new("_say('')", true), false),
 	], [], [], self)
 	assert(runtime.error_msg == "", "no error")
 	runtime.execute()
@@ -41,7 +27,7 @@ signal clicked
 func _on_button_2_pressed() -> void:
 	clicked.emit()
 
-func say(what: String) -> Signal:
+func _say(what: String) -> Signal:
 	label.text = what
 	return clicked
 
